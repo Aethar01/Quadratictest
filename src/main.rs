@@ -14,7 +14,7 @@ fn fill_quads() -> Vec<Quad> {
     for i in 0..usize::MAX {
         quads.insert(i, Quad {a: rng.gen_range(1.0..100.0), b: rng.gen_range(1.0..100.0), c: rng.gen_range(1.0..100.0), r1: 0.0, r2: 0.0})
     }
-    quads
+    return quads
 }
 
 fn quadratic_eq(mut quads: Quad) -> Quad {
@@ -23,20 +23,13 @@ fn quadratic_eq(mut quads: Quad) -> Quad {
         return quads;
 }
 
-fn  bepog() {
-    println!("pog")
-    }
-
 fn main() {
     use std::time::Instant;
     let a = fill_quads();
     let now = Instant::now();
     {
-    for i in 0..usize::MAX {
-    quadratic_eq(a[i]);
-    }
+    let _b = a.iter().map(|x| quadratic_eq(*x)).collect::<Vec<Quad>>();
     }
     let elapsed = now.elapsed();
-    bepog();
     println!("Elapsed: {:.2?}", elapsed)
 }
