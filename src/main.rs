@@ -1,4 +1,7 @@
 use rand::Rng;
+
+const N: usize = 1000000;
+
 #[derive(Debug, Copy, Clone)]
 struct Quad {
     a: f32,
@@ -11,7 +14,7 @@ struct Quad {
 fn fill_quads() -> Vec<Quad> {
     let mut rng = rand::thread_rng();
     let mut quads: Vec<Quad> = Vec::new();
-    for i in 0..usize::MAX {
+    for i in 0..N {
         quads.insert(i, Quad {a: rng.gen_range(1.0..100.0), b: rng.gen_range(1.0..100.0), c: rng.gen_range(1.0..100.0), r1: 0.0, r2: 0.0})
     }
     return quads
