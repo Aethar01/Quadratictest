@@ -63,16 +63,8 @@ version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fcaabb2fef8c910e7f4c7ce9f67a1283a1715879a7c230ca9d6d1ae31f16d91"
 
-[[package]]
-<<<<<<< HEAD
-=======
-name = "gaps"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8cc9b155d36f181fa0fd188aa0b2dfae33c63364708c4bfcf4e4f281332c823"
 
 [[package]]
->>>>>>> f755e77 (added both single and multithreaded + fixed only negative root generation)
 name = "getrandom"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -108,8 +100,6 @@ dependencies = [
 ]
 
 [[package]]
-<<<<<<< HEAD
-=======
 name = "num"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -186,7 +176,6 @@ dependencies = [
 ]
 
 [[package]]
->>>>>>> f755e77 (added both single and multithreaded + fixed only negative root generation)
 name = "num_cpus"
 version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -206,11 +195,7 @@ checksum = "eb9f9e6e233e5c4a35559a617bf40a4ec447db2e84c20b55a6f83167b7e57872"
 name = "quad2"
 version = "0.1.0"
 dependencies = [
-<<<<<<< HEAD
-=======
- "gaps",
  "num",
->>>>>>> f755e77 (added both single and multithreaded + fixed only negative root generation)
  "rand",
  "rayon",
 ]
