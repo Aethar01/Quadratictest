@@ -2,7 +2,7 @@ use rand::Rng;
 use rayon::prelude::*;
 use num::complex::Complex;
 
-const N: usize = 1000000;
+const N: usize = 100;
 const MAX_VALUE: f32 = 100.0;
 
 #[derive(Debug, Copy, Clone)]
@@ -15,10 +15,19 @@ struct ComplexQuad {
 }
 
 #[derive(Debug, Copy, Clone)]
-struct Quad {
+struct F32Quad {
     a: f32,
     b: f32,
     c: f32,
+    r1: f32,
+    r2: f32,
+}
+
+#[derive(Debug, Copy, Clone)]
+struct I32Quad {
+    a: i32,
+    b: i32,
+    c: i32,
     r1: f32,
     r2: f32,
 }
@@ -28,6 +37,46 @@ trait Quadratic<T> {
     fn quadratic_eq(&mut self);
     fn get_roots(&self) -> (T, T);
     fn fill_quads(nvar: usize) -> Vec<Self> where Self: Sized;
+}
+
+impl Quadratic<i32> for I32Quad {
+    fn new(a: i32, b: i32, c: i32) -> Self {
+        Self { a, b, c, r1: 0.0, r2: 0.0 }
+    }
+
+    fn quadratic_eq(&mut self) {
+        self.r1 = -self.b as f32 + (((self.b as f32 * self.b as f32) - 4.0 * self.a as f32 * self.c as f32)
+                               .sqrt() as f32) / (2 * self.a) as f32;    
+        self.r2 = -self.b as f32 - (((self.b as f32 * self.b as f32) - 4.0 * self.a as f32 * self.c as f32)
+                               .sqrt() as f32) / (2 * self.a) as f32;
+    }
+
+    fn get_roots(&self) -> (i32, i32) {
+        (self.r1 as i32, self.r2 as i32)
+    }
+
+    fn fill_quads(nvar: usize) -> Vec<Self> {
+        let mut rng = rand::thread_rng();
+        let mut quads = Vec::with_capacity(N);
+        for _ in 0..nvar {
+            let a = rng.gen_range(-MAX_VALUE as i32..=MAX_VALUE as i32);
+            let c = match a.is_positive() {
+                true => rng.gen_range(0..=MAX_VALUE as i32),
+                false => rng.gen_range(-MAX_VALUE as i32..=0),
+            };
+            let b = if 4 * a * c < 0 {
+                rng.gen_range(-MAX_VALUE as i32..=MAX_VALUE as i32)
+            } else {
+                match rng.gen_bool(0.5) {
+                    true => rng.gen_range((( 4 * a * c ) as f32).sqrt() as i32..=(MAX_VALUE * 2.0) as i32),
+                    false => rng.gen_range(-(MAX_VALUE * 2.0) as i32..=-(( 4 * a * c ) as f32).sqrt() as i32),
+                }
+                // rng.gen_range((4.0_f32 * a * c).sqrt()..=(MAX_VALUE * 2.0))
+            }; 
+            quads.push(I32Quad::new(a, b, c));
+        }
+        quads
+    }
 }
 
 impl Quadratic<Complex<f32>> for ComplexQuad {
@@ -59,7 +108,7 @@ impl Quadratic<Complex<f32>> for ComplexQuad {
     }
 }
 
-impl Quadratic<f32> for Quad {
+impl Quadratic<f32> for F32Quad {
     fn new(a: f32, b: f32, c: f32) -> Self {
         Self { a, b, c, r1: 0.0, r2: 0.0 }
     }
@@ -84,11 +133,16 @@ impl Quadratic<f32> for Quad {
                 true => rng.gen_range(0.0..=MAX_VALUE),
                 false => rng.gen_range(-MAX_VALUE..=0.0),
             };
-            let b = match rng.gen_bool(0.5) {
-                true => rng.gen_range((4.0_f32 * a * c).sqrt()..=(MAX_VALUE * 2.0)),
-                false => rng.gen_range(-(MAX_VALUE * 2.0)..=-(4.0_f32 * a * c).sqrt()),
-            };
-            quads.push(Quad::new(a, b, c));
+            let b = if 4.0_f32 * a * c < 0.0 {
+                rng.gen_range(-MAX_VALUE..=MAX_VALUE)
+            } else {
+                match rng.gen_bool(0.5) {
+                    true => rng.gen_range((4.0_f32 * a * c).sqrt()..=(MAX_VALUE * 2.0)),
+                    false => rng.gen_range(-(MAX_VALUE * 2.0)..=-(4.0_f32 * a * c).sqrt()),
+                }
+                // rng.gen_range((4.0_f32 * a * c).sqrt()..=(MAX_VALUE * 2.0))
+            }; 
+            quads.push(F32Quad::new(a, b, c));
         }
         quads
     }
@@ -98,7 +152,7 @@ fn main() {
     use std::time::Instant;
     let mut quadscom = ComplexQuad::fill_quads(N);
     let quadscom2 = quadscom.clone();
-    let mut quadsfloat = Quad::fill_quads(N);
+    let mut quadsfloat = F32Quad::fill_quads(N);
     let quadsfloat2 = quadsfloat.clone();
     let now = Instant::now();
     {
