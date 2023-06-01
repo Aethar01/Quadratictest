@@ -44,10 +44,36 @@ impl Quadratic<i32> for I32Quad {
     }
 
     fn quadratic_eq(&mut self) {
-        self.r1 = -self.b as f32 + (((self.b as f32 * self.b as f32) - 4.0 * self.a as f32 * self.c as f32)
-                               .sqrt() as f32) / (2 * self.a) as f32;    
-        self.r2 = -self.b as f32 - (((self.b as f32 * self.b as f32) - 4.0 * self.a as f32 * self.c as f32)
-                               .sqrt() as f32) / (2 * self.a) as f32;
+        if self.a == 0 {
+            self.r1 = 0.0;
+            self.r2 = 0.0;
+            return;
+        } else {
+            let _2 = i32::from(2);
+            let _4 = i32::from(4);
+
+            let discriminant = self.b * self.b - _4 * self.a * self.c;
+            if discriminant < i32::from(0) {
+                panic!("No real roots!");
+            } else {
+                if discriminant == i32::from(0) {
+                    self.r1 = ( -self.b / (_2 * self.a) ) as f32;
+                    self.r2 = self.r1;
+                } else {
+                    let sqrt_discriminant = (discriminant as f32).sqrt();
+
+                    let r1 = (-self.b as f32 + sqrt_discriminant) / (_2 as f32 * self.a as f32);
+                    let r2 = (-self.b as f32 - sqrt_discriminant) / (_2 as f32 * self.a as f32);
+                    if r1 < r2 {
+                        self.r1 = r1;
+                        self.r2 = r2;
+                    } else {
+                        self.r1 = r2;
+                        self.r2 = r1;
+                    }
+                }
+            }
+        }
     }
 
     fn get_roots(&self) -> (i32, i32) {
@@ -84,11 +110,34 @@ impl Quadratic<Complex<f32>> for ComplexQuad {
     }
 
     fn quadratic_eq(&mut self) {
-        self.r1 = -self.b + (((self.b * self.b) - 4.0 * self.a * self.c)
-                               .sqrt()) / (2.0 * self.a);    
-        self.r2 = -self.b - (((self.b * self.b) - 4.0 * self.a * self.c)
-                               .sqrt()) / (2.0 * self.a);
+        if self.a == Complex::new(0.0, 0.0) {
+            self.r1 = Complex::new(0.0, 0.0);
+            self.r2 = Complex::new(0.0, 0.0);
+            return;
+        } else {
+            let _2 = Complex::from(2.0);
+            let _4 = Complex::from(4.0);
+
+            let discriminant = self.b * self.b - _4 * self.a * self.c;
+            if discriminant == Complex::new(0.0, 0.0) {
+                self.r1 = -self.b / (_2 * self.a);
+                self.r2 = self.r1;
+            } else {
+                let sqrt_discriminant = discriminant.sqrt();
+
+                let r1 = (-self.b + sqrt_discriminant) / (_2 * self.a);
+                let r2 = (-self.b - sqrt_discriminant) / (_2 * self.a);
+                if r1.re < r2.re || r1.im < r2.im {
+                    self.r1 = r1;
+                    self.r2 = r2;
+                } else {
+                    self.r1 = r2;
+                    self.r2 = r1;
+                }
+            }
+        }
     }
+ 
 
     fn get_roots(&self) -> (Complex<f32>, Complex<f32>) {
         (self.r1, self.r2)
@@ -113,10 +162,36 @@ impl Quadratic<f32> for F32Quad {
     }
 
     fn quadratic_eq(&mut self) {
-        self.r1 = -self.b + (((self.b * self.b) - 4.0 * self.a * self.c)
-                               .sqrt()) / (2.0 * self.a);    
-        self.r2 = -self.b - (((self.b * self.b) - 4.0 * self.a * self.c)
-                               .sqrt()) / (2.0 * self.a);
+        if self.a == 0.0 {
+            self.r1 = 0.0;
+            self.r2 = 0.0;
+            return;
+        } else {
+            let _2 = f32::from(2.0);
+            let _4 = f32::from(4.0);
+
+            let discriminant = self.b * self.b - _4 * self.a * self.c;
+            if discriminant < f32::from(0.0) {
+                panic!("No real roots!");
+            } else {
+                if discriminant == f32::from(0.0) {
+                    self.r1 = ( -self.b / (_2 * self.a) ) as f32;
+                    self.r2 = self.r1;
+                } else {
+                    let sqrt_discriminant = (discriminant as f32).sqrt();
+
+                    let r1 = (-self.b as f32 + sqrt_discriminant) / (_2 as f32 * self.a as f32);
+                    let r2 = (-self.b as f32 - sqrt_discriminant) / (_2 as f32 * self.a as f32);
+                    if r1 < r2 {
+                        self.r1 = r1;
+                        self.r2 = r2;
+                    } else {
+                        self.r1 = r2;
+                        self.r2 = r1;
+                    }
+                }
+            }
+        }
     }
     
     fn get_roots(&self) -> (f32, f32) {
@@ -153,25 +228,29 @@ pub mod tests {
 
     #[test]
     fn test_i32_quad() {
-        let mut quad = I32Quad::new(4, 4, 1);
+        let mut quad = I32Quad::new(1, 5, 6);
         quad.quadratic_eq();
-        println!("{:?}", quad);
-        assert_eq!(quad.get_roots(), (-1, 0));
+        assert_eq!(quad.get_roots(), (-3, -2));
     }
 
     #[test]
     fn test_f32_quad() {
-        let mut quad = F32Quad::new(4.0, 4.0, 1.0);
+        let mut quad = F32Quad::new(1.0, 5.0, 6.0);
         quad.quadratic_eq();
-        println!("{:?}", quad);
-        assert_eq!(quad.get_roots(), (-0.5, 0.0));
+        assert_eq!(quad.get_roots(), (-3.0, -2.0));
     }
 
     #[test]
     fn test_complex_quad() {
-        let mut quad = ComplexQuad::new(Complex::new(4.0, 0.0), Complex::new(4.0, 0.0), Complex::new(1.0, 0.0));
+        let mut quad = ComplexQuad::new(Complex::new(1.0, 0.0), Complex::new(5.0, 0.0), Complex::new(6.0, 0.0));
         quad.quadratic_eq();
-        println!("{:?}", quad);
-        assert_eq!(quad.get_roots(), (Complex::new(-0.5, 0.0), Complex::new(0.0, 0.0)));
+        assert_eq!(quad.get_roots(), (Complex::new(-3.0, 0.0), Complex::new(-2.0, 0.0)));
+    }
+
+    #[test]
+    fn test_complex_quad2() {
+        let mut quad = ComplexQuad::new(Complex::new(1.0, 0.0), Complex::new(0.0, 0.0), Complex::new(1.0, 0.0));
+        quad.quadratic_eq();
+        assert_eq!(quad.get_roots(), (Complex::new(0.0, -1.0), Complex::new(0.0, 1.0)));
     }
 }
